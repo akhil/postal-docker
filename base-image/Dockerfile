@@ -12,8 +12,13 @@ RUN apt update -y && \
         libmysqlclient-dev \
         git \
         wget \
+        curl \
+        vim \
+        nmap \
         nodejs \
-        libcap2-bin 
+        libcap2-bin \
+        mariadb-client \
+        expect
 
 RUN mkdir -p /opt/postal/app /opt/postal/config
 
@@ -34,3 +39,7 @@ WORKDIR /opt/postal/app
 RUN bundle update --bundler --jobs=4 && rm -rf vendor
 RUN bundler config path /opt/postal/vendor
 RUN bundle install --path=/opt/postal/vendor/bundle --jobs=2 --clean --without=development assets
+
+ADD scripts /scripts
+
+RUN bin/postal initialize-config
