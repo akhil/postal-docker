@@ -1,0 +1,76 @@
+version: "3.8"
+
+services:
+  web:
+    image: postal-base
+    ports:
+      - 5000:5000
+    depends_on:
+      - "db"
+      - "rabbitmq"
+    volumes:
+      - ./config/postal.yml:/opt/postal/config/postal.yml
+      #- ./scripts/create-user.sh:/scripts/create-user.sh
+      - persistent_assets:/storage
+      - static_assets:/opt/postal/public
+      - postal_assets:/opt/postal/public/assets
+    environment:
+      - MYSQL_ROOT_PASSWORD=changeme
+      - MYSQL_DATABASE=db
+      - RABBITMQ_DEFAULT_USER=postal
+      - RABBITMQ_DEFAULT_PASS=changeme
+      - RABBITMQ_DEFAULT_VHOST=postal
+      # POSTAL_ variables are used by create-secretkey.sh
+      # & in smtp: portion of the postal.yml
+      - POSTAL_FNAME=Sia 
+      - POSTAL_LNAME=Cat
+      - POSTAL_PASSWORD=SecretCatPassword
+      - POSTAL_EMAIL=myemail@catsworld.com
+    command: "bundle exec puma -C config/puma.rb"
+
+  fast:
+    image: postal-base  
+    depends_on:
+      - "db"
+      - "rabbitmq"
+    volumes:
+      - ./config/postal.yml:/opt/postal/config/postal.yml
+      - ./Procfile:/opt/postal/app/Procfile
+      #- ./scripts/create-user.sh:/scripts/create-user.sh
+      - persistent_assets:/storage
+      - static_assets:/opt/postal/public
+      - postal_assets:/opt/postal/public/assets
+    environment:
+      - MYSQL_ROOT_PASSWORD=changeme
+      - MYSQL_DATABASE=db
+      - RABBITMQ_DEFAULT_USER=postal
+      - RABBITMQ_DEFAULT_PASS=changeme
+      - RABBITMQ_DEFAULT_VHOST=postal
+      # POSTAL_ variables are used by create-secretkey.sh
+      # & in smtp: portion of the postal.yml
+      - POSTAL_FNAME=Sia 
+      - POSTAL_LNAME=Cat
+      - POSTAL_PASSWORD=SecretCatPassword
+      - POSTAL_EMAIL=myemail@catsworld.com
+    command: "bin/postal run"
+
+  db:
+    image: mariadb:10
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=changeme
+      - MYSQL_DATABASE=postal
+
+  rabbitmq:
+    image: rabbitmq:3-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER=postal
+      - RABBITMQ_DEFAULT_PASS=changeme
+      - RABBITMQ_DEFAULT_VHOST=/postal
+
+volumes:
+  persistent_assets:
+  static_assets:
+  postal_assets:
+  mysql_data:

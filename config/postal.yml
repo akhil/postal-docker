@@ -1,0 +1,68 @@
+web:
+  # The host that the management interface will be available on
+  host: postal.example.com
+  # The protocol that requests to the management interface should happen on
+  protocol: http
+
+fast_server:
+  # This can be enabled to enable click & open tracking on emails. It is disabled by
+  # default as it requires a separate static IP address on your server.
+  enabled: true
+  bind_address: 0.0.0.0
+
+general:
+  # This can be changed to allow messages to be sent from multiple IP addresses
+  use_ip_pools: false
+
+main_db:
+  # Specify the connection details for your MySQL database
+  host: db
+  username: root
+  password: changeme
+  database: postal
+
+message_db:
+  # Specify the connection details for your MySQL server that will be house the
+  # message databases for mail servers.
+  host: db
+  username: root
+  password: changeme
+  prefix: postal
+
+rabbitmq:
+  # Specify the connection details for your RabbitMQ server.
+  host: rabbitmq
+  username: postal
+  password: changeme
+  vhost: /postal
+
+dns:
+  # Specifies the DNS record that you have configured. Refer to the documentation at
+  # https://github.com/atech/postal/wiki/Domains-&-DNS-Configuration for further
+  # information about these.
+  mx_records:
+    - mx.postal.example.com
+  smtp_server_hostname: postal.example.com
+  spf_include: spf.postal.example.com
+  return_path: rp.postal.example.com
+  route_domain: routes.postal.example.com
+  track_domain: track.postal.example.com
+
+smtp:
+  # Specify an SMTP server that can be used to send messages from the Postal management
+  # system to users. You can configure this to use a Postal mail server once the
+  # your installation has been set up.
+  host: 127.0.0.1
+  port: 2525
+  username: myemail@catsworld.com # Complete when Postal is running and you can
+  password: SecretCatPassword # generate the credentials within the interface.
+  from_name: Postal
+  from_address: postal@yourdomain.com
+
+rails:
+  # This is generated automatically by the config initialization. It should be a random
+  # string unique to your installation.
+  secret_key: c9180c13c23b31dee8fd794dd8ae0b2464a5aede48fe917c91f1efb9780a5ff8e57cb52a545b1e3c6f4342cd511fa811d9ba47baa8579ed1d4675a90347ade5667bb346576a054e796cd69e4dceabd92a5791ca1b2c613c280297a1137d295400d321c5e1db035e3463da03a95aad3ed38d67a16be2777b115832003cdd6aa60
+
+web_server:
+  bind_address: 0.0.0.0
