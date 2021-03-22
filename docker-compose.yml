@@ -2,9 +2,13 @@ version: "3.8"
 
 services:
   web:
+    #image: akhil/postal-base:latest
     image: postal-base
+    deploy:
+      mode: replicated
+      replicas: 2
     ports:
-      - 5000:5000
+      - 5000-5001:5000
     depends_on:
       - "db"
       - "rabbitmq"
@@ -27,8 +31,45 @@ services:
       - POSTAL_PASSWORD=SecretCatPassword
       - POSTAL_EMAIL=myemail@catsworld.com
     command: "bundle exec puma -C config/puma.rb"
+    healthcheck:
+      test: curl -sS http://127.0.0.1:5000 || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 3
+
+  smtp:
+    #image: akhil/postal-base:latest
+    image: postal-base
+    deploy:
+      mode: replicated
+      replicas: 2
+    ports:
+      - "8025-8026:25"
+    depends_on:
+      - "db"
+      - "rabbitmq"
+    volumes:
+      - ./config/postal.yml:/opt/postal/config/postal.yml
+      #- ./scripts/create-user.sh:/scripts/create-user.sh
+      - persistent_assets:/storage
+      - static_assets:/opt/postal/public
+      - postal_assets:/opt/postal/public/assets
+    environment:
+      - MYSQL_ROOT_PASSWORD=changeme
+      - MYSQL_DATABASE=db
+      - RABBITMQ_DEFAULT_USER=postal
+      - RABBITMQ_DEFAULT_PASS=changeme
+      - RABBITMQ_DEFAULT_VHOST=postal
+      # POSTAL_ variables are used by create-secretkey.sh
+      # & in smtp: portion of the postal.yml
+      - POSTAL_FNAME=Sia 
+      - POSTAL_LNAME=Cat
+      - POSTAL_PASSWORD=SecretCatPassword
+      - POSTAL_EMAIL=myemail@catsworld.com
+    command: "bundle exec rake postal:smtp_server"
 
   fast:
+    #image: akhil/postal-base:latest
     image: postal-base  
     depends_on:
       - "db"
@@ -53,6 +94,11 @@ services:
       - POSTAL_PASSWORD=SecretCatPassword
       - POSTAL_EMAIL=myemail@catsworld.com
     command: "bin/postal run"
+    healthcheck:
+      test: curl -sS http://127.0.0.1:80 || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 3
 
   db:
     image: mariadb:10

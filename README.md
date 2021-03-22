@@ -3,6 +3,8 @@
 
 ### `akhil/postal-base` image is built from `base-image/Dockerfile`
 
+![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/akhil/postal-base)
+
 The base image as all the gemfile dependencies installed.
 
 `postal` command is located at `/opt/postal/app/postal`
